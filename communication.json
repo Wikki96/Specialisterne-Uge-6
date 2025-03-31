@@ -1,11 +1,11 @@
 {   
-    "IP": "10.0.125.153",
+    "IP": "",
     "API": {
-        "PORT": 8000
+        "PORT": 0
     },
     "SQL": {
-        "PORT": 3306,
-        "USER": "curseist",
-        "PW": "curseword"
+        "PORT": 0,
+        "USER": "",
+        "PW": ""
     }
 }
