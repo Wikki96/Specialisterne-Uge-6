@@ -1,4 +1,4 @@
 host: localhost
 user: root
-pw: 250303
+pw:
 database: bike_store
