@@ -1,0 +1,4 @@
+host: localhost
+user: root
+pw: 250303
+database: bike_store
