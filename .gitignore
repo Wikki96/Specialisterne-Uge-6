@@ -398,5 +398,7 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Sensitive information
 communication.json
 config.txt

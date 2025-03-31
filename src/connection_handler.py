@@ -1,7 +1,7 @@
 import mysql.connector
 import load_config
 
-class MySQLConnector:
+class ConnectionHandler:
     """A wrapper for the mysql connector creating a cursor and 
     handling queries with one method.
     Public methods:
