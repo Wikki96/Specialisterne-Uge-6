@@ -1,5 +1,4 @@
 import mysql.connector
-import load_config
 
 class ConnectionHandler:
     """A wrapper for the mysql connector creating a cursor and 
@@ -7,11 +6,10 @@ class ConnectionHandler:
     Public methods:
     execute
     """
-    def __init__(self, database=""):
-        config = load_config()
+    def __init__(self, connection_info: dict):
         self.con = mysql.connector.connect(
-            host=config["host"], user=config["user"], 
-            password=config["pw"], database=database)
+            host=connection_info["HOST"], user=connection_info["USER"], 
+            password=connection_info["PW"], database=connection_info["DB"])
         self.cursor = self.con.cursor()
 
     def execute(self, query):

@@ -7,3 +7,4 @@ Brands og categories har deres egne tables med id - men de bliver kun brugt i pr
 Ordrer har både en reference til staff og stores - men staff er også tilknyttet store. Man kunne fjerne store fra ordrene og få den igennem staff - man skal så sikre sig at medarbejderne ikke flytter mellem butikkerne. Det kunne gøres med det nye staff id, så man får et nyt id ved en forflyttelse.
 
 For customers har jeg valgt at sige, at de skal have en email - hvilket de nuværende kunder også har.
+
