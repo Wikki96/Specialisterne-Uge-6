@@ -1,21 +1,58 @@
-import requests
-from mysql_handler import MySQLHandler
-import json
-import polars as pl
+from connection_handler import ConnectionHandler
 from load_config import load_config
+from mysql_handler import MySQLHandler
+import transformation as tr
+import os
+import polars as pl
 
 if __name__ == "__main__":
-    #config = load_config()
-    #remote_sql = config["REMOTE"]["SQL"]
-    #ip = config["REMOTE"]["IP"]
-    #port = config["REMOTE"]["API"]["PORT"]
-    #remote_sql["HOST"] = ip
-    #
-    #orders = requests.get(f"http://{ip}:{port}/orders")
-    #order_items = requests.get(f"http://{ip}:{port}/order_items")
-    #customers = requests.get(f"http://{ip}:{port}/customers")
-    #df = pl.DataFrame(json.loads(orders.json()))
-    #con = ConnectionHandler(remote_sql)
-    #brands = con.execute("SELECT * FROM brands")
+    # Setup database
+    config = load_config()
+    con = MySQLHandler(config["LOCAL"])
+    with open(os.path.join("MySQL", "bike_store.sql")) as f:
+        queries = f.read()
+    queries = queries.split(";")
+    for query in queries:
+        if query.strip() != "":
+            query = query.replace("bike_store", config["LOCAL"]["DB"])
+            con.execute(query)
+
+    # Extract
+    staffs = pl.read_csv(os.path.join("Data", "staffs.csv"))
+    stores = pl.read_csv(os.path.join("Data", "stores.csv"))
+    con = ConnectionHandler()
+    products = con.get_products()
+    brands = con.get_brands()
+    categories = con.get_categories()
+    customers = con.get_customers()
+    orders = con.get_orders()
+    stocks = con.get_stocks()
+    order_items = con.get_order_items()
+    print(products)
+    print(order_items)
+    # Transform
+    products = tr.combine_into_products(products=products, 
+                                        brands=brands, 
+                                        categories=categories)
+    products = tr.trim_product_names(products)
+    staffs = tr.make_managerid_int(staffs)
+    staffs = tr.fix_manager_id(staffs)
+    staffs = tr.remove_street_from_staffs(staffs)
+    staffs = tr.rename_to_first_name(staffs)
+    staffs = tr.make_id_column(staffs)
+    orders = tr.remove_store_from_orders(orders)
+    orders = tr.replace_name_with_id(orders, staffs)
+    orders = tr.format_dates(orders)
+    order_items = tr.remove_list_price_from_orderitems(order_items, products)
+    customers = tr.format_phone(customers)
+
+    # Load
+    con.write_to_local_database(products, "products")
+    con.write_to_local_database(stores, "stores")
+    con.write_to_local_database(staffs, "staffs")
+    con.write_to_local_database(customers, "customers")
+    con.write_to_local_database(orders, "orders")
+    con.write_to_local_database(stocks, "stocks")
+    con.write_to_local_database(order_items, "order_items")
     
     

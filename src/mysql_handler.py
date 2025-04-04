@@ -2,7 +2,8 @@ import mysql.connector
 
 class MySQLHandler:
     """A wrapper for the mysql connector creating a cursor and 
-    handling queries with one method.
+    handling queries with one method. If the given database doesn't 
+    exist, it will connect with no database selected.
     Public methods:
     execute
     """
@@ -15,7 +16,9 @@ class MySQLHandler:
                 password=connection_info["PW"], 
                 database=connection_info["DB"], 
                 port=connection_info["PORT"])
-        except mysql.connector.ProgrammingError:
+        # If the database can't be found 
+        # a ProgrammingError will be raised
+        except mysql.connector.ProgrammingError as e:
             self.con = mysql.connector.connect(
                 host=connection_info["HOST"], 
                 user=connection_info["USER"], 

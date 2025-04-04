@@ -11,5 +11,7 @@ Ordrer har både en reference til staff og stores - men staff er også tilknytte
 
 For customers har jeg valgt at sige, at de skal have en email - hvilket de nuværende kunder også har.
 
+Prisen på produkterne er gemt som floats i databasen, men de burde være gemt som decimaltal med 2 cifre efter kommaet.
+
 ## Kørsel af programmet
 
