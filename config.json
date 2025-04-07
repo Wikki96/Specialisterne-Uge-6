@@ -1,21 +1,21 @@
 {
     "LOCAL": {
         "HOST": "localhost",
-        "USER": "root",
-        "PW": "250303",
-        "DB": "test",
+        "USER": "",
+        "PW": "",
+        "DB": "",
         "PORT": 3306
     },
     "REMOTE": {
-        "IP": "10.0.125.153",
+        "IP": "",
         "API": {
-            "PORT": 8000
+            "PORT": 
         },
         "SQL": {
             
-            "USER": "curseist",
-            "PW": "curseword",
-            "DB": "productdb",
+            "USER": "",
+            "PW": "",
+            "DB": "",
             "PORT": 3306
         }
     }
