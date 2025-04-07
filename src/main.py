@@ -5,6 +5,7 @@ import transformation as tr
 import os
 import polars as pl
 
+
 if __name__ == "__main__":
     # Setup database
     config = load_config()
@@ -28,8 +29,7 @@ if __name__ == "__main__":
     orders = con.get_orders()
     stocks = con.get_stocks()
     order_items = con.get_order_items()
-    print(products)
-    print(order_items)
+
     # Transform
     products = tr.combine_into_products(products=products, 
                                         brands=brands, 

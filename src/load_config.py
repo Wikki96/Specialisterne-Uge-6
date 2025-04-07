@@ -1,7 +1,7 @@
 import json
 
 def load_config() -> list[str]:
-    """Load and return the config"""
+    """Load and return config.json"""
     try: f = open("config.json", "r")
     except PermissionError as e:
         print(f"Could not access config.json: {e}")

@@ -12,10 +12,11 @@
             "PORT": 8000
         },
         "SQL": {
-            "PORT": 3306,
+            
             "USER": "curseist",
             "PW": "curseword",
-            "DB": "productdb"
+            "DB": "productdb",
+            "PORT": 3306
         }
     }
 }
