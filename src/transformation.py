@@ -63,12 +63,12 @@ def combine_into_products(products: pl.DataFrame,
 
 def trim_product_names(products: pl.DataFrame) -> pl.DataFrame:
     """Removes the brand name and model year from the product name.
-    
+
     Must be used after combining brands and categories with products.
     """
     products = products.with_columns(product_name=
-        pl.col("product_name").str.strip_prefix(
-            pl.col("brand_name") + " ")
+        pl.col("product_name").str.strip_chars('"')
+        .str.strip_prefix(pl.col("brand_name") + " ")
         .str.strip_chars_end("1234567890/")
         .str.strip_chars_end(" -"))
     return products
