@@ -48,23 +48,23 @@ def make_id_column(staffs: pl.DataFrame) -> pl.DataFrame:
 
 # Cleanup of products
 
-def combine_into_products(products: pl.DataFrame, 
-                                             brands: pl.DataFrame, 
-                                             categories: pl.DataFrame
+def combine_brands_into_products(products: pl.DataFrame, 
+                                             brands: pl.DataFrame,
                                              ) -> pl.DataFrame:
     """Move the names of brands and categories into products to
     replace the id's.
     """
     products = products.join(brands, on="brand_id", how="inner")
-    products = products.join(categories, on="category_id", how="inner")
     products = products.drop("brand_id")
-    products = products.drop("category_id")
     return products
 
 def trim_product_names(products: pl.DataFrame) -> pl.DataFrame:
-    """Removes the brand name and model year from the product name.
+    """Remove the brand name and model year from the product name.
 
     Must be used after combining brands and categories with products.
+    Strips quotation marks then removes the brand name in the brand 
+    name column from the front of the string. Then removes any
+    numbers and slashes from the end of the string.
     """
     products = products.with_columns(product_name=
         pl.col("product_name").str.strip_chars('"')
@@ -72,6 +72,44 @@ def trim_product_names(products: pl.DataFrame) -> pl.DataFrame:
         .str.strip_chars_end("1234567890/")
         .str.strip_chars_end(" -"))
     return products
+
+def make_product_categories(products: pl.DataFrame
+                            ) -> pl.DataFrame:
+    """Make category dataframe with product names and category names.
+
+    Removes duplicate entries.
+    """
+    products = products.sort("product_id")
+    products = products.unique(subset=["product_name", 
+                                       "model_year"], 
+                               keep="first")
+    product_categories = products.select("product_id",
+                                              "category_id")
+    return product_categories
+
+def drop_category_id_and_remove_duplicates(products: pl.DataFrame) -> pl.DataFrame:
+    """Remove the category column and remove duplicates."""
+    products = products.drop("category_id").sort("product_id")
+    products = products.unique(subset=["product_name", 
+                                       "model_year"], 
+                               keep="first")
+    return products
+
+
+# Cleanup of stocks
+
+def merge_duplicate_products(stocks: pl.DataFrame, 
+                             products: pl.DataFrame,
+                             ) -> pl.DataFrame:
+    """Sum stocks of duplicate products.
+    
+    Must be used before removing duplicates in products.
+    """
+    joined = stocks.join(products, on="product_id")
+    joined = joined.group_by(["product_name", "model_year", "store_name"]).agg(
+        pl.col("quantity").sum(), pl.col("product_id").first())
+    stocks = joined.select("product_id", "store_name", "quantity")
+    return stocks
 
 
 # Cleanup of orders
@@ -93,10 +131,12 @@ def format_dates(orders: pl.DataFrame) -> pl.DataFrame:
     orders = __format_date(orders, "shipped_date")
     return orders
 
-def replace_name_with_id(orders: pl.DataFrame, staffs: pl.DataFrame) -> pl.DataFrame:
+def replace_name_with_id(orders: pl.DataFrame, 
+                         staffs: pl.DataFrame) -> pl.DataFrame:
     """Replace the name in orders with the corresponding staff id."""
     staffs = staffs.select(["staff_id", "first_name"])
-    orders = orders.join(staffs, left_on="staff_name", right_on="first_name")
+    orders = orders.join(staffs, left_on="staff_name", 
+                         right_on="first_name")
     orders = orders.drop("staff_name")
     return orders
 
@@ -104,10 +144,28 @@ def replace_name_with_id(orders: pl.DataFrame, staffs: pl.DataFrame) -> pl.DataF
 # Cleanup of order_items
 
 def remove_list_price_from_orderitems(order_items: pl.DataFrame,
-                                      products: pl.DataFrame
                                       ) -> pl.DataFrame:
     """Remove the column 'list_price'."""
     return order_items.drop("list_price")
+
+def remove_item_id(order_items: pl.DataFrame) -> pl.DataFrame:
+    """Remove column 'item_id'."""
+    return order_items.drop("item_id")
+
+def remove_duplicate_products(order_items: pl.DataFrame, 
+                              products: pl.DataFrame
+                              ) -> pl.DataFrame:
+    """Remove duplicate products and sum the quantities."""
+    joined = order_items.join(products, on="product_id").sort("product_id")
+    index = joined.group_by(["product_name", "model_year"]).agg(
+        pl.col("product_id").agg_groups())
+    joined.with_columns(pl.col("product_id").replace())
+    joined = joined.group_by(["product_name", "model_year", "order_id"]).agg(
+        pl.col("quantity").sum(), 
+        pl.col("discount").first(),
+        pl.col("product_id").first())
+    order_items = joined.select("order_id", "product_id", "quantity", "discount")
+    return order_items
 
 
 # Cleanup of customers

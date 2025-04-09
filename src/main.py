@@ -31,10 +31,16 @@ if __name__ == "__main__":
     order_items = con.get_order_items()
 
     # Transform
-    products = tr.combine_into_products(products=products, 
-                                        brands=brands, 
-                                        categories=categories)
+    order_items = tr.remove_list_price_from_orderitems(order_items)
+    order_items = tr.remove_item_id(order_items)
+    products = tr.combine_brands_into_products(products=products, 
+                                               brands=brands)
     products = tr.trim_product_names(products)
+    stocks = tr.merge_duplicate_products(stocks, products)
+    order_items = tr.remove_duplicate_products(order_items, products)
+    product_categories = tr.make_product_categories(products)
+    products = tr.drop_category_id_and_remove_duplicates(products)
+
     staffs = tr.make_managerid_int(staffs)
     staffs = tr.fix_manager_id(staffs)
     staffs = tr.remove_street_from_staffs(staffs)
@@ -43,7 +49,7 @@ if __name__ == "__main__":
     orders = tr.remove_store_from_orders(orders)
     orders = tr.replace_name_with_id(orders, staffs)
     orders = tr.format_dates(orders)
-    order_items = tr.remove_list_price_from_orderitems(order_items, products)
+    
     customers = tr.format_phone(customers)
 
     # Load
@@ -53,6 +59,7 @@ if __name__ == "__main__":
     con.write_to_local_database(customers, "customers")
     con.write_to_local_database(orders, "orders")
     con.write_to_local_database(stocks, "stocks")
+    con.write_to_local_database(categories, "categories")
+    con.write_to_local_database(product_categories, "product_categories")
     con.write_to_local_database(order_items, "order_items")
-    
     

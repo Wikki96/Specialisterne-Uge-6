@@ -119,7 +119,6 @@ class ConnectionHandler:
         """Load the table into the local database.
         
         Args:
-        -
         table - a polars dataframe containing the data
         destination - a string containing the name of the sql table
         """
