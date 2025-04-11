@@ -29,13 +29,6 @@ if __name__ == "__main__":
     orders = con.get_orders()
     stocks = con.get_stocks()
     order_items = con.get_order_items()
-    #products = pl.read_csv(os.path.join("Data", "products.csv"))
-    #brands = pl.read_csv(os.path.join("Data", "brands.csv"))
-    #categories = pl.read_csv(os.path.join("Data", "categories.csv"))
-    #customers = pl.read_csv(os.path.join("Data", "customers.csv"))
-    #orders = pl.read_csv(os.path.join("Data", "orders.csv"))
-    #stocks = pl.read_csv(os.path.join("Data", "stocks.csv"))
-    #order_items = pl.read_csv(os.path.join("Data", "order_items.csv"))
 
     # Transform
     order_items = tr.remove_list_price_from_orderitems(order_items)
