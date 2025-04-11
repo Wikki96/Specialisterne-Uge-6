@@ -155,16 +155,26 @@ def remove_item_id(order_items: pl.DataFrame) -> pl.DataFrame:
 def remove_duplicate_products(order_items: pl.DataFrame, 
                               products: pl.DataFrame
                               ) -> pl.DataFrame:
-    """Remove duplicate products and sum the quantities."""
-    joined = order_items.join(products, on="product_id").sort("product_id")
-    index = joined.group_by(["product_name", "model_year"]).agg(
-        pl.col("product_id").agg_groups())
-    joined.with_columns(pl.col("product_id").replace())
-    joined = joined.group_by(["product_name", "model_year", "order_id"]).agg(
-        pl.col("quantity").sum(), 
-        pl.col("discount").first(),
+    """Remove duplicate products and sum the quantities.
+    
+    Make products with multiple product id's have the same id,
+    then merge the rows with identical id by summing the quantity
+    and averaging the discount weighted by the quantity.
+    """
+    joined = order_items.join(products, 
+                              on="product_id").sort("product_id")
+    index = products.group_by(["product_name", "model_year"]).agg(
         pl.col("product_id").first())
-    order_items = joined.select("order_id", "product_id", "quantity", "discount")
+    joined = joined.drop("product_id")
+    joined = joined.join(index, on=["product_name", "model_year"])
+    joined = joined.group_by(["product_name", 
+                              "model_year", 
+                              "order_id"]).agg(
+        pl.col("quantity").sum(), 
+        (pl.col("discount")*pl.col("quantity")).sum()/pl.col("quantity").sum(),
+        pl.col("product_id").first())
+    order_items = joined.select("order_id", "product_id", 
+                                "quantity", "discount")
     return order_items
 
 

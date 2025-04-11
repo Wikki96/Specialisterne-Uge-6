@@ -402,3 +402,7 @@ FodyWeavers.xsd
 # Sensitive information
 communication.json
 config.txt
+config.json
+
+# Data
+Data/*

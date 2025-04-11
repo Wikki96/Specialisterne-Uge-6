@@ -77,11 +77,11 @@ class ConnectionHandler:
         self.local_uri = (f"mysql://{local_sql["USER"]}:"
             f"{local_sql["PW"]}@{local_sql["HOST"]}:"
             f"{local_sql["PORT"]}/{local_sql["DB"]}")
-        try:
-            self.remote_sql = MySQLHandler(remote_sql)
-        except mysql.connector.InterfaceError as e:
-            print("Could not connect to remote SQL server: " + e)
-            raise
+        #try:
+        #    self.remote_sql = MySQLHandler(remote_sql)
+        #except mysql.connector.InterfaceError as e:
+        #    print("Could not connect to remote SQL server: " + e)
+        #    raise
 
     def get_orders(self):
         return self.__dataframe_from_api("orders")

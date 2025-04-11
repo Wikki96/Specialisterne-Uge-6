@@ -15,5 +15,7 @@ Ordrer har både en reference til staff og stores - men staff er også tilknytte
 
 For customers har jeg valgt at sige, at de skal have en email - hvilket de nuværende kunder også har.
 
-Den samme cykel kan have flere kategorier. For at undgå fejl ved f.eks. opdatering af en cykels pris, hvor kun den ene kategori bliver opdateret, har jeg lavet et nyt table, hvor hvert product bliver koblet sammen med dets kategorier. Stocks som før var spredt ud over de forskellige entries for forskellige kategorier er blevet summeret.
+I order_items har jeg fjernet item_id, da dens funktion allerede udføres af product_id.
+
+Den samme cykel kan have flere kategorier. For at undgå fejl ved f.eks. opdatering af en cykels pris, hvor kun den ene kategori bliver opdateret, har jeg lavet et nyt table, hvor hvert product bliver koblet sammen med dets kategorier. Stocks som før var spredt ud over de forskellige entries for forskellige kategorier er blevet summeret. Hver ordre i order_items har fået dets duplikerede produkter lagt sammen med et gennemsnit af discounts vægtet på antal.
 
