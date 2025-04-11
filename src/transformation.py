@@ -84,10 +84,11 @@ def make_product_categories(products: pl.DataFrame
                                        "model_year"], 
                                keep="first")
     product_categories = products.select("product_id",
-                                              "category_id")
+                                         "category_id")
     return product_categories
 
-def drop_category_id_and_remove_duplicates(products: pl.DataFrame) -> pl.DataFrame:
+def drop_category_id_and_remove_duplicates(products: pl.DataFrame
+                                           ) -> pl.DataFrame:
     """Remove the category column and remove duplicates."""
     products = products.drop("category_id").sort("product_id")
     products = products.unique(subset=["product_name", 
@@ -106,7 +107,10 @@ def merge_duplicate_products(stocks: pl.DataFrame,
     Must be used before removing duplicates in products.
     """
     joined = stocks.join(products, on="product_id")
-    joined = joined.group_by(["product_name", "model_year", "store_name"]).agg(
+    joined = joined.group_by(["product_name", 
+                              "model_year", 
+                              "store_name"]
+                              ).agg(
         pl.col("quantity").sum(), pl.col("product_id").first())
     stocks = joined.select("product_id", "store_name", "quantity")
     return stocks
@@ -160,6 +164,7 @@ def remove_duplicate_products(order_items: pl.DataFrame,
     Make products with multiple product id's have the same id,
     then merge the rows with identical id by summing the quantity
     and averaging the discount weighted by the quantity.
+    Must be used before removing the duplicates from products.
     """
     joined = order_items.join(products, 
                               on="product_id").sort("product_id")
@@ -171,7 +176,8 @@ def remove_duplicate_products(order_items: pl.DataFrame,
                               "model_year", 
                               "order_id"]).agg(
         pl.col("quantity").sum(), 
-        (pl.col("discount")*pl.col("quantity")).sum()/pl.col("quantity").sum(),
+        (pl.col("discount")*pl.col("quantity")
+         ).sum()/pl.col("quantity").sum(),
         pl.col("product_id").first())
     order_items = joined.select("order_id", "product_id", 
                                 "quantity", "discount")
